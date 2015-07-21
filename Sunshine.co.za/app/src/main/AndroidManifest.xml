@@ -37,7 +37,14 @@
         </activity>
         <provider
             android:authorities="com.example.sinethembab.sunshinecoza"
-            android:name=".Data.WeatherProvider" />
+            android:name=".Data.WeatherProvider"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.example.sinethembab.sunshinecoza"/>
     </application>
+    <permission android:name="com.example.sinethembab.sunshinecoza"
+        android:protectionLevel="dangerous"
+        android:label="Licence to kill">
+    </permission>
 
 </manifest>
