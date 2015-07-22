@@ -34,6 +34,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final String SELECTED_KEY = "selected_position";
 
     private static final int FORECAST_LOADER = 0;
+
+    private boolean mUseTodayLayout;
+
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
     private static final String[] FORECAST_COLUMNS = {
@@ -149,6 +152,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
 
+        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+
         return rootView;
     }
 
@@ -215,7 +220,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         mForecastAdapter.swapCursor(null);
+    }
+
+    public void setUseTodayLayout(boolean useTodayLayout) {
+                mUseTodayLayout = useTodayLayout;
+                if (mForecastAdapter != null) {
+                        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+                    }
     }
 }
