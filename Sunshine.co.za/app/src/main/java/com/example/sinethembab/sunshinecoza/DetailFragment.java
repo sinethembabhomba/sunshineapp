@@ -1,5 +1,6 @@
 package com.example.sinethembab.sunshinecoza;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -37,6 +38,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private ShareActionProvider mShareActionProvider;
     private String mForecast;
     private Uri mUri;
+    ProgressDialog progress;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -91,6 +93,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
+
+        progress = ProgressDialog.show(getActivity(), "Full details ", "Please wait......", true);
+
+        new Thread()
+        {
+            public void run()
+            {
+                try {
+                    // sleep the thread, whatever time you want.
+                    sleep(2000);
+
+                }
+                catch (Exception e)
+                {
+
+                }
+                progress.dismiss();
+            }
+        }.start();
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
@@ -165,8 +186,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null && data.moveToFirst()) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data)
+    {
+
+        if (data != null && data.moveToFirst())
+        {
             // Read weather condition ID from cursor
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
 

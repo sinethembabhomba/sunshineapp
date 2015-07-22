@@ -1,5 +1,6 @@
 package com.example.sinethembab.sunshinecoza;
 
+import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int FORECAST_LOADER = 0;
 
     private boolean mUseTodayLayout;
+
+    ProgressDialog progress;
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -89,6 +92,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
+
+
     }
 
     @Override
@@ -113,6 +118,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+
         // The ForecastAdapter will take data from a source and
         // use it to populate the ListView it's attached to.
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
@@ -121,7 +128,28 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+
+        progress = ProgressDialog.show(getActivity(), "Loading weather information", "Please wait......", true);
+
+        new Thread()
+        {
+            public void run()
+            {
+                try {
+                    // sleep the thread, whatever time you want.
+                    sleep(5000);
+
+                }
+                catch (Exception e)
+                {
+
+                }
+                progress.dismiss();
+            }
+        }.start();
+
         mListView.setAdapter(mForecastAdapter);
+
         // We'll call our MainActivity
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -155,6 +183,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
 
         return rootView;
+
     }
 
     @Override
