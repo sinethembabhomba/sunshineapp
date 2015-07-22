@@ -1,6 +1,5 @@
 package com.example.sinethembab.sunshinecoza;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,6 +62,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     static final int COL_COORD_LONG = 8;
 
 
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri);
+    }
+
     public ForecastFragment() {
     }
 
@@ -94,9 +105,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-        // The CursorAdapter will take data from our cursor and populate the ListView.
+// The CursorAdapter will take data from our cursor and populate the ListView.
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -115,11 +124,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
                     String locationSetting = Utility.getPreferredLocation(getActivity());
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                    ((Callback) getActivity())
+                            .onItemSelected(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
                                     locationSetting, cursor.getLong(COL_WEATHER_DATE)
                             ));
-                    startActivity(intent);
                 }
             }
         });

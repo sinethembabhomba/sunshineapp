@@ -11,27 +11,36 @@ import android.view.MenuItem;
 import com.example.sinethembab.sunshinecoza.Data.Utility;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity  implements ForecastFragment.Callback {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private final String FORECASTFRAGMENT_TAG = "FFTAG";
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
+    private boolean mTwoPane;
     private String mLocation;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mLocation = Utility.getPreferredLocation(this);
 
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /*if (savedInstanceState == null)
-        {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment, new ForecastFragment(), FORECASTFRAGMENT_TAG)
-                    .commit();
-        }*/
+        if (findViewById(R.id.container) != null) {
+            // The detail container view will be present only in the large-screen layouts
+            // (res/layout-sw600dp). If this view is present, then the activity should be
+            // in two-pane mode.
+            mTwoPane = true;
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new DetailFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+        }
     }
 
 
@@ -50,20 +59,15 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
-        {
-
+        if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
-        if (id == R.id.action_map)
-        {
+        if (id == R.id.action_map) {
             openPreferredLocationInMap();
             return true;
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -93,11 +97,37 @@ public class MainActivity extends ActionBarActivity {
         String location = Utility.getPreferredLocation( this );
         // update the location in our second pane using the fragment manager
         if (location != null && !location.equals(mLocation)) {
-            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
+            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
             if ( null != ff ) {
                 ff.onLocationChanged();
             }
+            DetailFragment df = (DetailFragment)getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+            if ( null != df ) {
+                df.onLocationChanged(location);
+            }
             mLocation = location;
+        }
+    }
+
+    @Override
+    public void onItemSelected(Uri dateUri) {
+        if (mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, dateUri);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, DetailActivity.class)
+                    .setData(dateUri);
+            startActivity(intent);
         }
     }
 }
